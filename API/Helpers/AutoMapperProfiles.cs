@@ -10,5 +10,7 @@ public class AutoMapperProfiles : Profile
     {
         CreateMap<RegisterDto, AppUser>();
         CreateMap<AppUser, UserDto>();
+        CreateMap<Section, SectionDto>();
+        CreateMap<SectionCreateDto, Section>();
     }
 }

@@ -18,6 +18,8 @@ builder.Services.AddDbContext<DataContext>(opt =>
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ISectionRepository, SectionRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddIdentityCore<AppUser>(opt => 
