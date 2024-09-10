@@ -12,5 +12,7 @@ public class AutoMapperProfiles : Profile
         CreateMap<AppUser, UserDto>();
         CreateMap<Section, SectionDto>();
         CreateMap<SectionCreateDto, Section>();
+        CreateMap<Topic, TopicDto>();
+        CreateMap<TopicCreateDto, Topic>();
     }
 }
