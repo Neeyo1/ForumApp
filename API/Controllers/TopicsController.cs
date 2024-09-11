@@ -23,7 +23,7 @@ public class TopicsController(ITopicRepository topicRepository, ISectionReposito
     }
 
     [HttpGet]
-    public async Task<ActionResult<TopicDto>> GetTopicsForSection([FromQuery] int sectionId)
+    public async Task<ActionResult<IEnumerable<TopicDto>>> GetTopicsForSection([FromQuery] int sectionId)
     {
         var topics = await topicRepository.GetTopicsAsync(sectionId);
         return Ok(topics);

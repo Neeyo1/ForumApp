@@ -14,5 +14,7 @@ public class AutoMapperProfiles : Profile
         CreateMap<SectionCreateDto, Section>();
         CreateMap<Topic, TopicDto>();
         CreateMap<TopicCreateDto, Topic>();
+        CreateMap<Comment, CommentDto>();
+        CreateMap<CommentCreateDto, Comment>();
     }
 }

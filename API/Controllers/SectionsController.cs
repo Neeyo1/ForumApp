@@ -22,7 +22,7 @@ public class SectionsController(ISectionRepository sectionRepository, IMapper ma
     }
 
     [HttpGet]
-    public async Task<ActionResult<SectionDto>> GetSections()
+    public async Task<ActionResult<IEnumerable<SectionDto>>> GetSections()
     {
         var sections = await sectionRepository.GetSectionsAsync();
         return Ok(sections);

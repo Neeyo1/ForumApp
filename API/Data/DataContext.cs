@@ -12,6 +12,7 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<AppUser, 
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Topic> Topics { get; set; }
     public DbSet<Section> Sections { get; set; }
+    public DbSet<CommentEdit> CommentEdits { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -56,6 +57,13 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<AppUser, 
             .HasMany(x => x.AuthorOfComments)
             .WithOne(x => x.Author)
             .HasForeignKey(x => x.AuthorId)
+            .IsRequired();
+
+        //Comment - CommentEdit
+        builder.Entity<Comment>()
+            .HasMany(x => x.CommentEdits)
+            .WithOne(x => x.Comment)
+            .HasForeignKey(x => x.CommentId)
             .IsRequired();
     }
 }
