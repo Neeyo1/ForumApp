@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-[Authorize]
 public class SectionsController(ISectionRepository sectionRepository, IMapper mapper) : BaseApiController
 {
     [HttpGet("{sectionId}")]
@@ -28,6 +27,7 @@ public class SectionsController(ISectionRepository sectionRepository, IMapper ma
         return Ok(sections);
     }
 
+    [Authorize(Policy = "RequireModeratorRole")]
     [HttpPost]
     public async Task<ActionResult<SectionDto>> CreateSection(SectionCreateDto sectionCreateDto)
     {
@@ -38,6 +38,7 @@ public class SectionsController(ISectionRepository sectionRepository, IMapper ma
         return BadRequest("Failed to create section");
     }
 
+    [Authorize(Policy = "RequireModeratorRole")]
     [HttpPut("{sectionId}")]
     public async Task<ActionResult<SectionDto>> EditSection(SectionCreateDto sectionCreateDto, int sectionId)
     {
@@ -50,6 +51,7 @@ public class SectionsController(ISectionRepository sectionRepository, IMapper ma
         return BadRequest("Failed to edit section");
     }
 
+    [Authorize(Policy = "RequireModeratorRole")]
     [HttpDelete("{sectionId}")]
     public async Task<ActionResult<SectionDto>> DeleteSection(int sectionId)
     {

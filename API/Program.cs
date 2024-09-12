@@ -47,6 +47,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         }
     );
 
+builder.Services.AddAuthorizationBuilder()
+            .AddPolicy("RequireModeratorRole", policy => policy.RequireRole("Admin", "Moderator"));
+
 var app = builder.Build();
 
 app.UseAuthentication();
