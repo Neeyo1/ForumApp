@@ -5,13 +5,15 @@ using API.Extensions;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
 [Authorize]
 public class CommentsController(ICommentRepository commentRepository, IUserRepository userRepository,
-    ITopicRepository topicRepository, ISectionRepository sectionRepository, IMapper mapper) : BaseApiController
+    ITopicRepository topicRepository, ISectionRepository sectionRepository, IMapper mapper,
+    UserManager<AppUser> userManager) : BaseApiController
 {
     [HttpGet("{commentId}")]
     public async Task<ActionResult<CommentDto>> GetComment(int commentId)
@@ -36,8 +38,11 @@ public class CommentsController(ICommentRepository commentRepository, IUserRepos
         if (user == null) return BadRequest("User does not exist");
         if (topic == null) return BadRequest("Topic does not exist");
         if (section == null) return BadRequest("Section does not exist");
-        if (!section.IsOpen) return BadRequest("You cannot add comments in closed sections");
-        if (!topic.IsOpen) return BadRequest("You cannot add comments in closed topics");
+
+        var userRoles = await userManager.GetRolesAsync(user);
+        var canModerate = IsModerator(userRoles);
+        if (!section.IsOpen && !canModerate) return BadRequest("You cannot add comments in closed sections");
+        if (!topic.IsOpen && !canModerate) return BadRequest("You cannot add comments in closed topics");
 
         var comment = mapper.Map<Comment>(commentCreateDto);
         comment.TopicId = topicId;
@@ -61,8 +66,12 @@ public class CommentsController(ICommentRepository commentRepository, IUserRepos
         if (user == null) return BadRequest("User does not exist");
         if (topic == null) return BadRequest("Topic does not exist");
         if (section == null) return BadRequest("Section does not exist");
-        if (!section.IsOpen) return BadRequest("You cannot edit comments in closed sections");
-        if (!topic.IsOpen) return BadRequest("You cannot edit comments in closed topics");
+
+        var userRoles = await userManager.GetRolesAsync(user);
+        var canModerate = IsModerator(userRoles);
+        if (!section.IsOpen && !canModerate) return BadRequest("You cannot edit comments in closed sections");
+        if (!topic.IsOpen && !canModerate) return BadRequest("You cannot edit comments in closed topics");
+        if (comment.AuthorId != user.Id && !canModerate) return Unauthorized();
 
         var commentEdit = new CommentEdit
         {
@@ -87,9 +96,12 @@ public class CommentsController(ICommentRepository commentRepository, IUserRepos
         if (user == null) return BadRequest("User does not exist");
         if (topic == null) return BadRequest("Topic does not exist");
         if (section == null) return BadRequest("Section does not exist");
-        if (!section.IsOpen) return BadRequest("You cannot delete comments in closed sections");
-        if (!topic.IsOpen) return BadRequest("You cannot delete comments in closed topics");
-        if (comment.AuthorId != user.Id) return Unauthorized();
+
+        var userRoles = await userManager.GetRolesAsync(user);
+        var canModerate = IsModerator(userRoles);
+        if (!section.IsOpen && !canModerate) return BadRequest("You cannot delete comments in closed sections");
+        if (!topic.IsOpen && !canModerate) return BadRequest("You cannot delete comments in closed topics");
+        if (comment.AuthorId != user.Id && !canModerate) return Unauthorized();
 
         comment.IsDeleted = true;
 
@@ -118,5 +130,10 @@ public class CommentsController(ICommentRepository commentRepository, IUserRepos
         if (section == null) return (user, topic, null);
 
         return (user, topic, section);
+    }
+
+    private static bool IsModerator(IList<string> userRoles)
+    {
+        return userRoles.Contains("Moderator") || userRoles.Contains("Admin");
     }
 }
