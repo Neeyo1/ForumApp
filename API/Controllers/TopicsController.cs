@@ -2,6 +2,7 @@ using System;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -24,9 +25,10 @@ public class TopicsController(ITopicRepository topicRepository, ISectionReposito
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TopicDto>>> GetTopicsForSection([FromQuery] int sectionId)
+    public async Task<ActionResult<IEnumerable<TopicDto>>> GetTopicsForSection([FromQuery] TopicParams topicParams)
     {
-        var topics = await topicRepository.GetTopicsAsync(sectionId);
+        var topics = await topicRepository.GetTopicsAsync(topicParams);
+        Response.AddPaginationHeader(topics);
         return Ok(topics);
     }
 
