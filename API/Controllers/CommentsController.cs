@@ -2,6 +2,7 @@ using System;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -25,9 +26,10 @@ public class CommentsController(ICommentRepository commentRepository, IUserRepos
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CommentDto>>> GetCommentsForTopic([FromQuery] int topicId)
+    public async Task<ActionResult<IEnumerable<CommentDto>>> GetCommentsForTopic([FromQuery] CommentParams commentParams)
     {
-        var comments = await commentRepository.GetCommentsAsync(topicId);
+        var comments = await commentRepository.GetCommentsAsync(commentParams);
+        Response.AddPaginationHeader(comments);
         return Ok(comments);
     }
 
